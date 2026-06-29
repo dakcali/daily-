@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sabah Brifing</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg:        #0d0f14;
+    --surface:   #13161e;
+    --border:    #1e2330;
+    --accent:    #4f7cff;
+    --accent-dim:#1a2a55;
+    --gold:      #c9a84c;
+    --green:     #3ecf8e;
+    --red:       #f07070;
+    --text:      #e2e6f0;
+    --muted:     #6b7590;
+    --tag-crit:  #3d1515;
+    --tag-imp:   #2a2010;
+    --tag-info:  #0f1f2a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .logo-text { font-weight: 600; font-size: 15px; letter-spacing: .02em; }
+  .logo-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .time-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--muted);
+    background: var(--border); padding: 4px 10px; border-radius: 6px;
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+  }
+
+  .main { display: flex; flex: 1; min-height: 0; }
+
+  aside {
+    width: 220px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    padding: 16px 12px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow-y: auto;
+  }
+  .aside-label {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .1em;
+    color: var(--muted); padding: 10px 8px 4px;
+  }
+  .quick-btn {
+    background: none; border: 1px solid transparent;
+    color: var(--text); font-size: 12.5px;
+    padding: 8px 10px; border-radius: 8px;
+    text-align: left; cursor: pointer;
+    transition: all .15s; line-height: 1.4;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .quick-btn:hover { background: var(--border); border-color: var(--border); }
+  .quick-btn .qicon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  .chat-area {
+    flex: 1; display: flex; flex-direction: column; min-width: 0;
+  }
+
+  #messages {
+    flex: 1; overflow-y: auto; padding: 24px 28px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  #messages::-webkit-scrollbar { width: 4px; }
+  #messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .msg { display: flex; gap: 12px; max-width: 860px; }
+  .msg.user { flex-direction: row-reverse; align-self: flex-end; }
+
+  .avatar {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0; margin-top: 2px;
+    font-weight: 600;
+  }
+  .avatar.ai  { background: var(--accent-dim); color: var(--accent); }
+  .avatar.usr { background: #1e2a1e; color: var(--green); }
+
+  .bubble {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 16px;
+    line-height: 1.65; font-size: 13.5px;
+    max-width: 820px;
+  }
+  .msg.user .bubble {
+    background: var(--accent-dim); border-color: var(--accent);
+    color: #c8d6ff;
+  }
+
+  /* Setup banner */
+  .setup-banner {
+    background: var(--tag-imp); border: 1px solid var(--gold);
+    border-radius: 10px; padding: 14px 16px; margin: 0 28px 16px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .setup-banner b { color: var(--gold); }
+  .setup-banner input {
+    width: 100%; margin-top: 10px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px;
+    padding: 8px 12px; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; outline: none;
+  }
+  .setup-banner input:focus { border-color: var(--gold); }
+  .save-proxy-btn {
+    margin-top: 8px;
+    background: var(--gold); color: #0d0f14;
+    border: none; border-radius: 8px;
+    padding: 7px 16px; font-size: 12px; font-weight: 600;
+    cursor: pointer;
+  }
+  .save-proxy-btn:hover { opacity: .85; }
+
+  .typing { display: flex; gap: 4px; align-items: center; padding: 10px 0; }
+  .typing span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--muted); animation: blink 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: .2s; }
+  .typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink {
+    0%,80%,100% { opacity: .3; transform: scale(1); }
+    40% { opacity: 1; transform: scale(1.3); }
+  }
+
+  .input-bar {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    padding: 14px 24px;
+    display: flex; gap: 10px; align-items: flex-end;
+    flex-shrink: 0;
+  }
+  textarea {
+    flex: 1; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px; font-family: 'Inter', sans-serif;
+    font-size: 13.5px; resize: none; min-height: 42px; max-height: 120px;
+    outline: none; line-height: 1.5; transition: border-color .15s;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); }
+
+  .send-btn {
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 10px;
+    padding: 10px 18px; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: opacity .15s; flex-shrink: 0;
+    height: 42px;
+  }
+  .send-btn:hover { opacity: .85; }
+  .send-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .briefing-btn {
+    background: var(--accent-dim); color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 10px;
+    padding: 10px 14px; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: opacity .15s; flex-shrink: 0;
+    height: 42px; white-space: nowrap;
+  }
+  .briefing-btn:hover { opacity: .8; }
+  .briefing-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  aside::-webkit-scrollbar { width: 3px; }
+  aside::-webkit-scrollbar-thumb { background: var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    <div>
+      <div class="logo-text">Sabah Brifing</div>
+      <div class="logo-sub">Demir için kişisel asistan</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="time-badge" id="liveClock">--:--</div>
+    <div class="status-dot" id="statusDot" title="Hazır"></div>
+  </div>
+</header>
+
+<div class="main">
+  <aside>
+    <div class="aside-label">Hızlı Sorgular</div>
+    <button class="quick-btn" onclick="quickSend('Tam sabah brifingini hazırla: haberler, finans, hava, toplantılar ve mailler')">
+      <span class="qicon">🌅</span>Tam sabah brifingini hazırla
+    </button>
+    <button class="quick-btn" onclick="quickSend('Bugün ve yarın Outlook takvimindeki tüm toplantıları listele')">
+      <span class="qicon">📅</span>Bugün & yarınki toplantılar
+    </button>
+    <button class="quick-btn" onclick="quickSend('Dün 18:00\\'a kadar gelen mailleri önem sırasına göre sınıflandır')">
+      <span class="qicon">📧</span>Mail sınıflandırması
+    </button>
+    <button class="quick-btn" onclick="quickSend('Güncel dolar, euro ve altın fiyatlarını getir')">
+      <span class="qicon">💰</span>Finans verileri
+    </button>
+    <button class="quick-btn" onclick="quickSend('Bugünün en önemli 5 haberini özetle')">
+      <span class="qicon">📰</span>Top 5 haber
+    </button>
+    <button class="quick-btn" onclick="quickSend('İstanbul için bugünün hava durumunu ver')">
+      <span class="qicon">🌤</span>İstanbul hava durumu
+    </button>
+    <button class="quick-btn" onclick="quickSend('BIST ve NASDAQ\\'ta bugün önemli bir gelişme var mı?')">
+      <span class="qicon">📈</span>BIST & NASDAQ
+    </button>
+    <button class="quick-btn" onclick="quickSend('Son gelen mail için taslak cevap oluştur')">
+      <span class="qicon">✏️</span>Taslak cevap yaz
+    </button>
+
+    <div class="aside-label" style="margin-top:12px">Ayarlar</div>
+    <button class="quick-btn" onclick="showSetup()" style="color:var(--muted)">
+      <span class="qicon">⚙️</span>Proxy URL ayarla
+    </button>
+  </aside>
+
+  <div class="chat-area">
+    <!-- Setup banner — shown until proxy URL is saved -->
+    <div class="setup-banner" id="setupBanner">
+      <b>⚙️ Vercel Proxy URL'ini gir</b><br>
+      Vercel deploy sonrası aldığın URL'i yapıştır (örn: <code style="font-size:11px;color:var(--gold)">https://sabah-brifing.vercel.app</code>)
+      <input type="text" id="proxyInput" placeholder="https://your-project.vercel.app" />
+      <button class="save-proxy-btn" onclick="saveProxy()">Kaydet & Bağlan</button>
+    </div>
+
+    <div id="messages">
+      <div class="msg">
+        <div class="avatar ai">🤖</div>
+        <div class="bubble">
+          Merhaba Demir! Proxy URL'ini girdikten sonra hazırım.<br><br>
+          Henüz deploy etmediysen aşağıdaki kurulum rehberini takip et — 10 dakika yeterli.
+        </div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <button class="briefing-btn" id="briefBtn" onclick="runFullBriefing()">☀️ Tam Brifing</button>
+      <textarea id="userInput" placeholder="Bir şey sor…" rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">Gönder</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config ──
+let PROXY_URL = localStorage.getItem('proxy_url') || '';
+
+// On load: if proxy saved, hide setup banner
+window.addEventListener('load', () => {
+  if (PROXY_URL) {
+    document.getElementById('setupBanner').style.display = 'none';
+    document.getElementById('proxyInput').value = PROXY_URL;
+    appendMsg('ai', `Bağlantı hazır → <code style="font-size:12px;color:var(--gold)">${PROXY_URL}</code><br>Başlamak için ☀️ Tam Brifing butonuna tıkla veya bir şey sor.`);
+  }
+});
+
+function saveProxy() {
+  const val = document.getElementById('proxyInput').value.trim().replace(/\/$/, '');
+  if (!val.startsWith('http')) { alert('Geçerli bir URL gir (https://...)'); return; }
+  PROXY_URL = val;
+  localStorage.setItem('proxy_url', val);
+  document.getElementById('setupBanner').style.display = 'none';
+  appendMsg('ai', `✅ Proxy kaydedildi: <code style="font-size:12px;color:var(--gold)">${val}</code><br>Artık hazırım — ☀️ Tam Brifing ile başlayabilirsin.`);
+}
+
+function showSetup() {
+  document.getElementById('setupBanner').style.display = 'block';
+}
+
+// ── Clock ──
+function updateClock() {
+  const now = new Date();
+  document.getElementById('liveClock').textContent =
+    now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+setInterval(updateClock, 1000); updateClock();
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function quickSend(text) {
+  document.getElementById('userInput').value = text;
+  sendMessage();
+}
+
+function appendMsg(role, content) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg' + (role === 'user' ? ' user' : '');
+  const av = document.createElement('div');
+  av.className = 'avatar ' + (role === 'user' ? 'usr' : 'ai');
+  av.textContent = role === 'user' ? 'D' : '🤖';
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.innerHTML = content;
+  div.appendChild(av); div.appendChild(bub);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return bub;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg'; div.id = 'typing-ind';
+  div.innerHTML = `<div class="avatar ai">🤖</div>
+    <div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function removeTyping() {
+  const el = document.getElementById('typing-ind');
+  if (el) el.remove();
+}
+
+function setLoading(v) {
+  document.getElementById('sendBtn').disabled = v;
+  document.getElementById('briefBtn').disabled = v;
+  document.getElementById('userInput').disabled = v;
+  document.getElementById('statusDot').style.background = v ? 'var(--gold)' : 'var(--green)';
+}
+
+const history = [];
+
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ''; autoResize(input);
+  appendMsg('user', escHtml(text));
+  await chat(text);
+}
+
+async function chat(userText) {
+  if (!PROXY_URL) {
+    showSetup();
+    appendMsg('ai', '⚠️ Önce Vercel proxy URL\'ini kaydet.');
+    return;
+  }
+
+  setLoading(true); showTyping();
+  history.push({ role: 'user', content: userText });
+
+  const systemPrompt = `Sen Demir'in kişisel sabah asistanısın. Türkçe yanıt ver.
+Görevlerin: haber özeti, finans verileri, hava durumu, Outlook mail/takvim analizi.
+Microsoft 365 MCP sunucusuna erişimin var — mail ve takvim için kullan.
+Yanıtlarını net, özlü ve yapılandırılmış tut.`;
+
+  try {
+    const resp = await fetch(`${PROXY_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: history,
+        mcp_servers: [{
+          type: 'url',
+          url: 'https://microsoft365.mcp.claude.com/mcp',
+          name: 'microsoft365'
+        }],
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }]
+      })
+    });
+
+    const data = await resp.json();
+    removeTyping();
+
+    if (!resp.ok) {
+      appendMsg('ai', `<span style="color:var(--red)">API Hatası: ${data.error?.message || JSON.stringify(data)}</span>`);
+      setLoading(false); return;
+    }
+
+    const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text);
+    const replyText = textBlocks.join('\n') || '(Yanıt alınamadı)';
+    history.push({ role: 'assistant', content: replyText });
+
+    const bubble = appendMsg('ai', '');
+    bubble.innerHTML = formatReply(replyText);
+
+  } catch (err) {
+    removeTyping();
+    appendMsg('ai', `<span style="color:var(--red)">Bağlantı hatası: ${err.message}<br>Proxy URL doğru mu?</span>`);
+  }
+  setLoading(false);
+}
+
+async function runFullBriefing() {
+  const today = new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+
+  appendMsg('user', `☀️ Tam sabah brifingini başlat — ${today}`);
+
+  const prompt = `Aşağıdaki adımları sırayla gerçekleştir ve her bölümü açıkça başlıkla:
+
+1. HABERLER: Dün gece ve bugün sabahın en önemli 5 haberini web'den ara (Türkiye ve dünya). Her haber için kaynak ve saat ekle.
+
+2. FİNANS: Güncel USD/TRY, EUR/TRY, altın (gram/TRY) fiyatlarını ve değişim yüzdelerini getir. BIST 100 ve NASDAQ'ta önemli bir gelişme var mı?
+
+3. HAVA DURUMU: İstanbul için bugünün hava durumunu getir (sıcaklık, durum, yağış).
+
+4. TAKVİM: Microsoft 365 üzerinden Outlook takvimini kontrol et. Bugün ve yarın olan toplantıları, saatleri ve katılımcılarıyla listele.
+
+5. MAİLLER: Dün ${yesterday} saat 18:00'a kadar gelen mailleri oku ve şu şekilde sınıflandır:
+   - ÇOK ÖNEMLİ (acil aksiyon gerektiren)
+   - ÖNEMLİ (yanıt gerekli ama acil değil)
+   - BİLGİLENDİRİCİ (okundu yeterli)
+   Yanıt gerektiren mailler için kısa taslak cevap öner.`;
+
+  await chat(prompt);
+}
+
+// ── Helpers ──
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatReply(text) {
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let lines = text.split('\n');
+  let html = '';
+  for (let line of lines) {
+    if (/^#{1,3}\s/.test(line)) {
+      const lvl = line.match(/^(#+)/)[1].length;
+      const content = esc(line.replace(/^#+\s*/, ''));
+      const sizes = ['18px','15px','13px'];
+      const colors = ['var(--gold)','var(--accent)','var(--text)'];
+      html += `<div style="font-size:${sizes[lvl-1]};font-weight:600;color:${colors[lvl-1]};margin:${lvl===1?'18px':'10px'} 0 6px;">${content}</div>`;
+    } else if (/^\*\*(.+)\*\*$/.test(line.trim())) {
+      html += `<div style="font-weight:600;margin:8px 0 2px;">${esc(line.trim().replace(/\*\*/g,''))}</div>`;
+    } else if (/^[-•*]\s/.test(line.trim())) {
+      html += `<div style="display:flex;gap:8px;padding:3px 0;"><span style="color:var(--accent);flex-shrink:0;">▸</span><span>${inlineFormat(esc(line.trim().replace(/^[-•*]\s/,'')))}</span></div>`;
+    } else if (/^\d+\.\s/.test(line.trim())) {
+      const m = line.trim().match(/^(\d+)\.\s+(.*)/);
+      if (m) html += `<div style="display:flex;gap:8px;padding:3px 0;"><span style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;min-width:18px;margin-top:2px;">${m[1]}.</span><span>${inlineFormat(esc(m[2]))}</span></div>`;
+    } else if (/^---+$/.test(line.trim())) {
+      html += `<hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">`;
+    } else if (line.trim() === '') {
+      html += '<div style="height:6px;"></div>';
+    } else {
+      html += `<p style="line-height:1.7;margin:2px 0;">${inlineFormat(esc(line))}</p>`;
+    }
+  }
+  return html;
+}
+
+function inlineFormat(s) {
+  s = s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  s = s.replace(/\*(.+?)\*/g, '<i>$1</i>');
+  s = s.replace(/`(.+?)`/g, `<code style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:'JetBrains Mono',monospace;font-size:12px;">$1</code>`);
+  return s;
+}
+</script>
+</body>
+</html>
